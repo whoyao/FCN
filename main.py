@@ -77,7 +77,6 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     input = tf.add(input, conv_1x1_layer3)
     output = tf.layers.conv2d_transpose(input, num_classes, 16, strides=(8,8), padding='same',
                                        kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
-
     return output
 tests.test_layers(layers)
 
@@ -94,7 +93,8 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     # FIXME: make sure your code is right
     logits = tf.reshape(nn_last_layer,(-1,num_classes))
     cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits, correct_label))
-    return None, None, None
+    tran_op = tf.train.AdagradOptimizer(learning_rate).minimize(cross_entropy_loss)
+    return logits, tran_op, cross_entropy_loss
 tests.test_optimize(optimize)
 
 
@@ -113,7 +113,10 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param keep_prob: TF Placeholder for dropout keep probability
     :param learning_rate: TF Placeholder for learning rate
     """
-    # TODO: Implement function
+    # FIXME: make sure your code is right
+    for epoch in epochs:
+        for image, label in get_batches_fn(batch_size):
+            
     pass
 tests.test_train_nn(train_nn)
 
