@@ -116,7 +116,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     # FIXME: make sure your code is right
     for epoch in epochs:
         for image, label in get_batches_fn(batch_size):
-            
+
     pass
 tests.test_train_nn(train_nn)
 
@@ -145,6 +145,9 @@ def run():
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
 
         # TODO: Build NN using load_vgg, layers, and optimize function
+        input_image, keep_prob, layer3_out, layer4_out, layer7_out =load_vgg(sess, vgg_path)
+        layer_output = layers(layer3_out, layer4_out, layer7_out, num_classes)
+        logits, tran_op, cross_entropy_loss = optimize(layer_output, )
 
         # TODO: Train NN using the train_nn function
 
