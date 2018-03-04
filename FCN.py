@@ -4,7 +4,10 @@ import helper
 import warnings
 from distutils.version import LooseVersion
 import project_tests as tests
+import argparse
 
+
+FLAGS = None
 
 # Check TensorFlow Version
 assert LooseVersion(tf.__version__) >= LooseVersion('1.0'), 'Please use TensorFlow version 1.0 or newer.  You are using {}'.format(tf.__version__)
@@ -123,8 +126,8 @@ tests.test_train_nn(train_nn)
 def run():
     num_classes = 2
     image_shape = (160, 576)
-    data_dir = './data'
-    runs_dir = './runs'
+    data_dir = os.path.join(FLAGS.buckets,'data')
+    runs_dir = os.path.join(FLAGS.buckets,'runs')
     tests.test_for_kitti_dataset(data_dir)
 
     # Download pretrained vgg model
@@ -166,4 +169,10 @@ def run():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--buckets', type=str, default='',
+                        help='input data path')
+    parser.add_argument('--checkpointDir', type=str, default='',
+                        help='output model path')
+    FLAGS, _ = parser.parse_known_args()
     run()
