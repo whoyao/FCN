@@ -121,7 +121,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
         for image, label in get_batches_fn(batch_size):
             _, loss = sess.run([train_op, cross_entropy_loss],
                                feed_dict={input_image: image, correct_label: label, keep_prob: 0.5,
-                                          learning_rate: 1e-4})
+                                          learning_rate: 5e-4})
         print("Epoch {} finished, loss is {:.3f}".format(epoch+1, loss))
 tests.test_train_nn(train_nn)
 
@@ -159,8 +159,8 @@ def run():
         logits, tran_op, cross_entropy_loss = optimize(layer_output, correct_label, learning_rate, num_classes)
 
         # TODO: Train NN using the train_nn function
-        epochs = 50
-        batch_size = 5
+        epochs = 150
+        batch_size = 50
 
         train_nn(sess, epochs, batch_size, get_batches_fn, tran_op, cross_entropy_loss, input_image,
                  correct_label, keep_prob, learning_rate)
