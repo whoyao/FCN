@@ -44,9 +44,6 @@ def load_vgg(sess, vgg_path):
 tests.test_load_vgg(load_vgg, tf)
 
 
-L2_REG = 1e-5
-STDEV = 1e-3
-
 def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     """
     Create the layers for a fully convolutional network.  Build skip-layers using the vgg layers.
@@ -84,36 +81,6 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     return output
 tests.test_layers(layers)
 
-# def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
-#     """
-#     Create the layers for a fully convolutional network.  Build skip-layers using the vgg layers.
-#     :param vgg_layer7_out: TF Tensor for VGG Layer 3 output
-#     :param vgg_layer4_out: TF Tensor for VGG Layer 4 output
-#     :param vgg_layer3_out: TF Tensor for VGG Layer 7 output
-#     :param num_classes: Number of classes to classify
-#     :return: The Tensor for the last layer of output
-#     """
-#     layer7_conv_1x1 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, 1,
-#                                        padding='same', kernel_initializer=tf.random_normal_initializer(stddev=STDEV),
-#                                        kernel_regularizer=tf.contrib.layers.l2_regularizer(L2_REG))
-#     output = tf.layers.conv2d_transpose(layer7_conv_1x1, num_classes, 4, 2,
-#                                         padding='same', kernel_initializer=tf.random_normal_initializer(stddev=STDEV),
-#                                         kernel_regularizer=tf.contrib.layers.l2_regularizer(L2_REG))
-#     layer4_conv_1x1 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, 1,
-#                                        padding='same', kernel_initializer=tf.random_normal_initializer(stddev=STDEV),
-#                                        kernel_regularizer=tf.contrib.layers.l2_regularizer(L2_REG))
-#     output = tf.add(output, layer4_conv_1x1)
-#     output = tf.layers.conv2d_transpose(output, num_classes, 4, 2,
-#                                         padding='same', kernel_initializer=tf.random_normal_initializer(stddev=STDEV),
-#                                         kernel_regularizer=tf.contrib.layers.l2_regularizer(L2_REG))
-#     layer3_conv_1x1 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, 1,
-#                                        padding='same', kernel_initializer=tf.random_normal_initializer(stddev=STDEV),
-#                                        kernel_regularizer=tf.contrib.layers.l2_regularizer(L2_REG))
-#     output = tf.add(output, layer3_conv_1x1)
-#     output = tf.layers.conv2d_transpose(output, num_classes, 16, 8,
-#                                         padding='same', kernel_initializer=tf.random_normal_initializer(stddev=STDEV),
-#                                         kernel_regularizer=tf.contrib.layers.l2_regularizer(L2_REG))
-#     return output
 
 
 def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
@@ -133,6 +100,8 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     return logits, tran_op, cross_entropy_loss
 tests.test_optimize(optimize)
 
+
+LEARNING_RATE = 5e-4
 
 def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image,
              correct_label, keep_prob, learning_rate):
@@ -155,8 +124,12 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
         for image, label in get_batches_fn(batch_size):
             _, loss = sess.run([train_op, cross_entropy_loss],
                                feed_dict={input_image: image, correct_label: label, keep_prob: 0.5,
-                                          learning_rate: 5e-4})
+                                          learning_rate: LEARNING_RATE})
         print("Epoch {} finished, loss is {:.3f}".format(epoch+1, loss))
+        if loss < 0.15:
+            LEARNING_RATE = 5e-5
+        elif loss < 0.05 :
+            LEARNING_RATE = 1e-5
 tests.test_train_nn(train_nn)
 
 
