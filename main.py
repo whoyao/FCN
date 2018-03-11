@@ -56,28 +56,28 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     # FIXME: make sure your code is right
     # manipulation for layer7
     conv_1x1_layer7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, strides=(1, 1), padding='same',
-                                       kernel_initializer=tf.truncated_normal_initializer(stddev=1e-3, seed=1),
-                                       kernel_regularizer=tf.contrib.layers.l2_regularizer(5e-5))
+                                       kernel_initializer=tf.truncated_normal_initializer(stddev=1e-2, seed=1),
+                                       kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-4))
     output_layer7 = tf.layers.conv2d_transpose(conv_1x1_layer7, num_classes, 4, strides=(2, 2), padding='same',
-                                               kernel_initializer=tf.truncated_normal_initializer(stddev=1e-3, seed=1),
-                                               kernel_regularizer=tf.contrib.layers.l2_regularizer(5e-5))
+                                               kernel_initializer=tf.truncated_normal_initializer(stddev=1e-2, seed=1),
+                                               kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-4))
     # manipulation for layer4
     conv_1x1_layer4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, strides=(1, 1), padding='same',
-                                       kernel_initializer=tf.truncated_normal_initializer(stddev=1e-3, seed=1),
-                                       kernel_regularizer=tf.contrib.layers.l2_regularizer(5e-5))
+                                       kernel_initializer=tf.truncated_normal_initializer(stddev=1e-2, seed=1),
+                                       kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-4))
     # manipulation for layer3
     conv_1x1_layer3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, strides=(1, 1), padding='same',
-                                       kernel_initializer=tf.truncated_normal_initializer(stddev=1e-3, seed=1),
-                                       kernel_regularizer=tf.contrib.layers.l2_regularizer(5e-5))
+                                       kernel_initializer=tf.truncated_normal_initializer(stddev=1e-2, seed=1),
+                                       kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-4))
     # skip connections
     input = tf.add(conv_1x1_layer4, output_layer7)
     input = tf.layers.conv2d_transpose(input, num_classes, 4, strides=(2, 2), padding='same',
-                                       kernel_initializer=tf.truncated_normal_initializer(stddev=1e-3, seed=1),
-                                       kernel_regularizer=tf.contrib.layers.l2_regularizer(5e-5))
+                                       kernel_initializer=tf.truncated_normal_initializer(stddev=1e-2, seed=1),
+                                       kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-4))
     input = tf.add(input, conv_1x1_layer3)
     output = tf.layers.conv2d_transpose(input, num_classes, 16, strides=(8, 8), padding='same',
-                                        kernel_initializer=tf.truncated_normal_initializer(stddev=1e-3, seed=1),
-                                        kernel_regularizer=tf.contrib.layers.l2_regularizer(5e-5))
+                                        kernel_initializer=tf.truncated_normal_initializer(stddev=1e-2, seed=1),
+                                        kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-4))
     return output
 tests.test_layers(layers)
 
@@ -117,7 +117,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param keep_prob: TF Placeholder for dropout keep probability
     :param learning_rate: TF Placeholder for learning rate
     """
-    LEARNING_RATE = 5e-4
+    LEARNING_RATE = 1e-3
     # FIXME: make sure your code is right
     sess.run(tf.global_variables_initializer())
     for epoch in range(epochs):
@@ -126,9 +126,10 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
                                feed_dict={input_image: image, correct_label: label, keep_prob: 0.5,
                                           learning_rate: LEARNING_RATE})
         print("Epoch {} finished, loss is {:.3f}".format(epoch+1, loss))
-        if loss < 0.15:
-            LEARNING_RATE = 5e-5
-        elif loss < 0.05 :
+        
+        if loss < 0.20:
+            LEARNING_RATE = 1e-4
+        elif loss < 0.10 :
             LEARNING_RATE = 1e-5
 tests.test_train_nn(train_nn)
 
